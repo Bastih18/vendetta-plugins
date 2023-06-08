@@ -39,22 +39,23 @@ function onLoad() {
     console.log("HiddenChannel loaded 2.4");
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
     
-    patches.push(instead("can", Permissions, (args, orig) => {
+    /*patches.push(instead("can", Permissions, (args, orig) => {
         const [permID, channel] = args;
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
             channelOverride(channel);
             return true;
         };
         return orig(...args);
-    }));
+    }));*/
 
-/*    patches.push(after("can", Permissions, ([permID, channel], res) => {
+    patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
             channelOverride(channel);
+            channel.lastMessageId = undefined;
             return true;
         };
         return res;
-    }));*/
+    }));
 
     patches.push(instead("transitionToGuild", Router, (args, orig) => {
         const [_, channel] = args;

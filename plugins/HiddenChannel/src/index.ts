@@ -1,6 +1,6 @@
 import { ApplicationCommandType, ApplicationCommandInputType } from "../../../ApplicationCommandTypes"
-import { findByName, findByStoreName, findByProps } from "@vendetta/metro";
-import { instead, after, before } from "@vendetta/patcher";
+import { findByName, findByProps } from "@vendetta/metro";
+import { instead, after } from "@vendetta/patcher";
 import { constants, React } from "@vendetta/metro/common";
 import { getAssetIDByName } from "@vendetta/ui/assets"
 import { registerCommand } from "@vendetta/commands"
@@ -17,8 +17,6 @@ const Fetcher = findByProps("stores", "fetchMessages");
 const { ChannelTypes } = findByProps("ChannelTypes");
 const {getChannel} = findByProps("getChannel");
 const { bulkAck } = findByProps("bulkAck")
-const ReadStateStore = findByStoreName("ReadStateStore");
-const ChannelStore = findByStoreName("ChannelStore");
 
 const skipChannels = [
     ChannelTypes.DM, 
@@ -39,13 +37,6 @@ function isHidden(channel: any | undefined) {
     return res;
 }
 
-function channelOverride(channel: any | undefined) {
-    if(isHidden(channel)) {
-        if ((channel.lMsg == undefined || channel.lMsg != channel.lastMessageId) && channel.lastMessageId != undefined) channel.lMsg = channel.lastMessageId;
-        channel.lastMessageId = undefined;
-    }
-}
-
 function addUnreadChannel(channel: any | undefined) {
     var guildUnread = unreadChannels.get(channel.guild_id)
     if (!guildUnread) guildUnread = [];
@@ -54,11 +45,13 @@ function addUnreadChannel(channel: any | undefined) {
 }
 
 let readCmd = undefined;
+let muteCmd = undefined;
 
 function onLoad() {
-    console.log("HiddenChannel 5.2 loaded");
+    console.log("HiddenChannel 5.3 loaded");
 
     readCmd = registerCommand({
+        applicationId: "hiddenchannel",
         name: "markhiddenread",
         displayName: "markhiddenread",
         description: "mark all hidden channels in this guild as read",
@@ -69,6 +62,7 @@ function onLoad() {
         execute: async (args, ctx) => {
             try {
                 bulkAck(unreadChannels.get(ctx.guild.id));
+                unreadChannels.delete(ctx.guild.id);
                 return showToast("Marked all hidden channels as read", getAssetIDByName("check"));
             } catch(e) {
                 console.log(e);
@@ -77,6 +71,26 @@ function onLoad() {
             }
         }
     })
+
+    muteCmd = registerCommand({
+        applicationId: "hiddenchannel",
+        name: "mutehidden",
+        displayName: "mutehidden",
+        description: "mute all hidden channels in this guild",
+        displayDescription: "mute all hidden channels in this guild",
+        options: [],
+        inputType: ApplicationCommandInputType.BUILT_IN_TEXT as number,
+        type: ApplicationCommandType.CHAT as number,
+        execute: async (args, ctx) => {
+            try {
+                
+            } catch(e) {
+                console.log(e);
+                logger.error(e);
+                return ClydeUtils.sendBotMessage(ctx.channel.id, "Error muting channels");
+            }
+        }
+    });
     
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
         
@@ -111,6 +125,7 @@ export default {
     onLoad,
     onUnload: () => {
         readCmd();
+        muteCmd();
         for (const unpatch of patches) {
             unpatch();
         };

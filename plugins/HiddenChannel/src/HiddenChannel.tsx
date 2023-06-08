@@ -52,6 +52,7 @@ function FancyDate({date}) {
 }
 
 export default function HiddenChannel({channel}) {
+    console.log(channel)
     return <View style={MessageStyles.container}>
         <Text style={MessageStyles.title}>This channel is hidden.</Text>
         <Text style={MessageStyles.text}>

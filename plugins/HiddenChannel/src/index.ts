@@ -1,6 +1,10 @@
+import { ApplicationCommandType, ApplicationCommandInputType } from "../../../ApplicationCommandTypes"
 import { findByName, findByStoreName, findByProps } from "@vendetta/metro";
-import { constants, React } from "@vendetta/metro/common";
 import { instead, after, before } from "@vendetta/patcher";
+import { constants, React } from "@vendetta/metro/common";
+import { registerCommand } from "@vendetta/commands"
+import { showToast } from "@vendetta/ui/toasts"
+import { logger } from "@vendetta"
 import HiddenChannel from "./HiddenChannel";
 
 let patches = [];
@@ -10,6 +14,7 @@ const Router = findByProps("transitionToGuild");
 const Fetcher = findByProps("stores", "fetchMessages");
 const { ChannelTypes } = findByProps("ChannelTypes");
 const {getChannel} = findByProps("getChannel");
+const { bulkAck } = findByProps("bulkAck")
 const ReadStateStore = findByStoreName("ReadStateStore");
 const ChannelStore = findByStoreName("ChannelStore");
 
@@ -18,6 +23,8 @@ const skipChannels = [
     ChannelTypes.GROUP_DM, 
     ChannelTypes.GUILD_CATEGORY
 ]
+
+const unreadChannels = new Map();
 
 function isHidden(channel: any | undefined) {
     if (channel == undefined) return false;
@@ -37,35 +44,43 @@ function channelOverride(channel: any | undefined) {
     }
 }
 
+function addUnreadChannel(channel: any | undefined) {
+    var guildUnread = unreadChannels.get(channel.guild_id)
+    if (!guildUnread) guildUnread = [];
+    if (!guildUnread.includes(channel.id)) guildUnread.push({channelId: channel.id, messageId: channel.lastMessageId});
+    unreadChannels.set(channel.guild_id, guildUnread);
+}
+
+let readCmd = undefined;
+
 function onLoad() {
-    console.log("HiddenChannel loaded 5.0");
+    console.log("HiddenChannel 5.1 loaded");
+
+    readCmd = registerCommand({
+        name: "markhiddenread",
+        displayName: "markhiddenread",
+        description: "mark all hidden channels in this guild as read",
+        displayDescription: "mark all hidden channels in this guild as read",
+        options: [],
+        inputType: ApplicationCommandInputType.BUILT_IN_TEXT as number,
+        type: ApplicationCommandType.CHAT as number,
+        execute: async (args, ctx) => {
+            try {
+                console.log(ctx);
+            } catch(e) {
+                console.log(e);
+                logger.error(e);
+            }
+        }
+    })
+    
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
-
-    
-    console.log("Patch getForDebugging");
-    after("getForDebugging", ReadStateStore, (_, ret) => {
-        console.log("HiddenChannel: Patching channel overrides");
-        if (ret == undefined) return;
-        patches.push(before("canBeUnread", ret.__proto__, function() {if (isHidden(getChannel(this.channelId))) {channelOverride(getChannel(this.channelId)); return false};}));
-        return ret;
-    }, true);
-    console.log("HiddenChannel: Patching channel overrides done");
-    //ReadStateStore.getForDebugging(Object.keys(ChannelStore.__getLocalVars().guildChannels)[0])
-    //console.log("HiddenChannel: Patching channel overrides done 2");
-    
-     patches.push(instead("hasUnread", ReadStateStore, (args, orig) => {
-        const channel = getChannel(args[0]);
-        if (isHidden(channel)) {
-            ReadStateStore.getForDebugging(getChannel(channel.id));
-            return false;
-        };
-        return orig(args);
-    }));
-
+        
     patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
-            ReadStateStore.getForDebugging(getChannel(channel.id));
-            channelOverride(channel);
+            if (isHidden(channel)) {
+                addUnreadChannel(channel);
+            }
             return true;
         };
         return res;
@@ -91,6 +106,7 @@ function onLoad() {
 export default {
     onLoad,
     onUnload: () => {
+        readCmd();
         for (const unpatch of patches) {
             unpatch();
         };

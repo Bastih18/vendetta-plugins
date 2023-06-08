@@ -48,7 +48,7 @@ let readCmd = undefined;
 let muteCmd = undefined;
 
 function onLoad() {
-    console.log("HiddenChannel 5.4 loaded");
+    console.log("HiddenChannel 5.5 loaded");
 
     readCmd = registerCommand({
         name: "markhiddenread",

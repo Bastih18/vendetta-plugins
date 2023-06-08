@@ -50,7 +50,7 @@ function onLoad() {
     }, true);
     console.log("HiddenChannel: Patching channel overrides done");
     ReadStateStore.getForDebugging(Object.keys(ChannelStore.__getLocalVars().guildChannels)[0])
-    console.log("HiddenChannel: Patching channel overrides done 2"); */
+    console.log("HiddenChannel: Patching channel overrides done 2");
     
 /*     patches.push(instead("hasUnread", ReadStateStore, (args, orig) => {
         const channel = getChannel(args[0]);

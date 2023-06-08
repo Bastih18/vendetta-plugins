@@ -51,7 +51,6 @@ function onLoad() {
     console.log("HiddenChannel 5.3 loaded");
 
     readCmd = registerCommand({
-        applicationId: "hiddenchannel",
         name: "markhiddenread",
         displayName: "markhiddenread",
         description: "mark all hidden channels in this guild as read",
@@ -73,7 +72,6 @@ function onLoad() {
     })
 
     muteCmd = registerCommand({
-        applicationId: "hiddenchannel",
         name: "mutehidden",
         displayName: "mutehidden",
         description: "mute all hidden channels in this guild",
@@ -83,7 +81,7 @@ function onLoad() {
         type: ApplicationCommandType.CHAT as number,
         execute: async (args, ctx) => {
             try {
-                
+
             } catch(e) {
                 console.log(e);
                 logger.error(e);

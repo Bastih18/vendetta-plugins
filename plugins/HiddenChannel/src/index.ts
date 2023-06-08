@@ -2,6 +2,7 @@ import { ApplicationCommandType, ApplicationCommandInputType } from "../../../Ap
 import { findByName, findByStoreName, findByProps } from "@vendetta/metro";
 import { instead, after, before } from "@vendetta/patcher";
 import { constants, React } from "@vendetta/metro/common";
+import { getAssetIDByName } from "@vendetta/ui/assets"
 import { registerCommand } from "@vendetta/commands"
 import { showToast } from "@vendetta/ui/toasts"
 import { logger } from "@vendetta"
@@ -9,6 +10,7 @@ import HiddenChannel from "./HiddenChannel";
 
 let patches = [];
 
+const ClydeUtils = findByProps("sendBotMessage")
 const Permissions = findByProps("getChannelPermissions", "can");
 const Router = findByProps("transitionToGuild");
 const Fetcher = findByProps("stores", "fetchMessages");
@@ -54,7 +56,7 @@ function addUnreadChannel(channel: any | undefined) {
 let readCmd = undefined;
 
 function onLoad() {
-    console.log("HiddenChannel 5.1 loaded");
+    console.log("HiddenChannel 5.2 loaded");
 
     readCmd = registerCommand({
         name: "markhiddenread",
@@ -66,10 +68,12 @@ function onLoad() {
         type: ApplicationCommandType.CHAT as number,
         execute: async (args, ctx) => {
             try {
-                console.log(ctx);
+                bulkAck(unreadChannels.get(ctx.guild.id));
+                return showToast("Marked all hidden channels as read", getAssetIDByName("check"));
             } catch(e) {
                 console.log(e);
                 logger.error(e);
+                return ClydeUtils.sendBotMessage(ctx.channel.id, "Error marking channels as read");
             }
         }
     })

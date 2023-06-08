@@ -38,7 +38,7 @@ function channelOverride(channel: any | undefined) {
 }
 
 function onLoad() {
-    console.log("HiddenChannel loaded 4.8");
+    console.log("HiddenChannel loaded 4.9");
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
 
     
@@ -73,6 +73,7 @@ function onLoad() {
 
     patches.push(instead("transitionToGuild", Router, (args, orig) => {
         const [_, channel] = args;
+        console.log(args, orig);
         if (!isHidden(channel) && typeof orig === "function") orig(args);
     }));
 

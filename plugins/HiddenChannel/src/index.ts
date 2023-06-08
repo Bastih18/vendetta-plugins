@@ -34,7 +34,7 @@ function onLoad() {
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
     
     patches.push(after("can", Permissions, ([permID, channel], res) => {
-        if(isHidden(channel)) {
+        if (permID == constants.Permissions.VIEW_CHANNEL && isHidden(channel)) {
             if (lastMessageId.get(channel.id) == undefined) {
                 lastMessageId.set(channel.id, channel.lastMessageId);
                 channel.lMsgId = lastMessageId.get(channel.id);

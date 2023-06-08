@@ -33,7 +33,7 @@ function onLoad() {
     
     patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
-            if(isHidden(channel)) channel.name = "Hidden Channel";
+            if(channel.id == "933799544737656952") console.log(channel);
             return true;
         };
         return res;

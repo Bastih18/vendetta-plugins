@@ -30,15 +30,15 @@ function isHidden(channel: any | undefined) {
     return res;
 }
 function onLoad() {
-    console.log("HiddenChannel loaded 1.2");
+    console.log("HiddenChannel loaded 1.3");
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
     
     patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
             if(channel.id == "933799544737656952") {
-                console.log(channel.id, channel.lastMessageId)
-                lastMessageId.set(channel.id, channel.lastMessageId);
-                console.log("LMSGID: ", lastMessageId.get(channel.id))
+                if (lastMessageId.get(channel.id) == undefined)
+                    lastMessageId.set(channel.id, channel.lastMessageId);
+                channel.lMsgId = lastMessageId.get(channel.id);
                 channel.lastMessageId = undefined;
             };
             return true;
@@ -59,7 +59,7 @@ function onLoad() {
     patches.push(instead("default", MessagesConnected, (args, orig) => {
         const channel = args[0]?.channel;
         if (!isHidden(channel) && typeof orig === "function") return orig(...args);
-        else {console.log('Showing hidden channel stuff'); return React.createElement(HiddenChannel, {channel, lastMessageId: lastMessageId.get(channel.id)})};
+        else {console.log('Showing hidden channel stuff'); return React.createElement(HiddenChannel, {channel})};
     }));
 }
 

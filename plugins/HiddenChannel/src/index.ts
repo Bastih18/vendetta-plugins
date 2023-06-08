@@ -28,14 +28,15 @@ function isHidden(channel: any | undefined) {
     return res;
 }
 function onLoad() {
-    console.log("HiddenChannel loaded 2.0");
+    console.log("HiddenChannel loaded 2.1");
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
     
     patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
-            if (channel.lMsg == undefined || channel.lMsg != channel.lastMessageId) channel.lMsg = channel.lastMessageId;
-            channel.lastMessageId = undefined;
-            console.log(channel.name);
+            if (isHidden(channel)) {
+                if (channel.lMsg == undefined || channel.lMsg != channel.lastMessageId) channel.lMsg = channel.lastMessageId;
+                channel.lastMessageId = undefined;
+            };
             return true;
         };
         return res;

@@ -36,7 +36,7 @@ function channelOverride(channel: any | undefined) {
 }
 
 function onLoad() {
-    console.log("HiddenChannel loaded 2.6");
+    console.log("HiddenChannel loaded 2.7");
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
     
     /*patches.push(instead("can", Permissions, (args, orig) => {
@@ -60,6 +60,7 @@ function onLoad() {
     patches.push(instead("transitionToGuild", Router, (args, orig) => {
         const [_, channel] = args;
         channelOverride(channel);
+        channel.lastMessageId = undefined;
         if (!isHidden(channel) && typeof orig === "function") orig(args);
     }));
 
@@ -73,6 +74,7 @@ function onLoad() {
     patches.push(instead("default", MessagesConnected, (args, orig) => {
         const channel = args[0]?.channel;
         channelOverride(channel);
+        channel.lastMessageId = undefined;
         if (!isHidden(channel) && typeof orig === "function") return orig(...args);
         else {return React.createElement(HiddenChannel, {channel})};
     }));

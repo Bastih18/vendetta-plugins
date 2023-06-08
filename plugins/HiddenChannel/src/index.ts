@@ -32,8 +32,7 @@ function onLoad() {
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
     
     patches.push(after("can", Permissions, ([permID, channel], res) => {
-        if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) return true;
-        console.log("RES", res);
+        if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) return false;
         return res;
     }));
 

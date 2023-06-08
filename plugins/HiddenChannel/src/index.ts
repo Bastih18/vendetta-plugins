@@ -33,6 +33,7 @@ function onLoad() {
     
     patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
+            if (!channel.name.startsWith("👁️‍🗨️✖️ | ")) channel.name = "👁️‍🗨️✖️ | "+channel.name;
             if (channel.lMsg == undefined || channel.lMsg != channel.lastMessageId) channel.lMsg = channel.lastMessageId;
             channel.lastMessageId = undefined;
             return true;

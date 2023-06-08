@@ -41,8 +41,11 @@ function onLoad() {
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
 
     patches.push(instead("hasUnread", ReadStateStore, (args, orig) => {
-        console.log("hasUnread ", args, orig);
-        console.log(orig(args));
+        if (isHidden(args[0])) { 
+            console.log("hasUnread ", args[0], " is hidden");
+            return false;
+        };
+        return orig(args);
     }));
 
     patches.push(after("can", Permissions, ([permID, channel], res) => {

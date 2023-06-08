@@ -32,14 +32,8 @@ function onLoad() {
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
     
     patches.push(after("can", Permissions, ([permID, channel], res) => {
-        if(channel && channel.guild_id == "1015931589865246730") console.log(permID, channel, res);
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) return true;
         return res;
-    }));
-
-    patches.push(instead("transitionToGuild", Router, (args, orig) => {
-        const [_, channel] = args;
-        if (!isHidden(channel) && typeof orig === "function") orig(args);
     }));
 
     patches.push(instead("fetchMessages", Fetcher, (args, orig) => {

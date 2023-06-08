@@ -28,7 +28,7 @@ function isHidden(channel: any | undefined) {
     return res;
 }
 function onLoad() {
-    console.log("HiddenChannel loaded 1.9");
+    console.log("HiddenChannel loaded 2.0");
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
     
     patches.push(after("can", Permissions, ([permID, channel], res) => {
@@ -42,16 +42,22 @@ function onLoad() {
 
     patches.push(instead("transitionToGuild", Router, (args, orig) => {
         const [_, channel] = args;
+        if (channel.lMsg == undefined || channel.lMsg != channel.lastMessageId) channel.lMsg = channel.lastMessageId;
+        channel.lastMessageId = undefined;
         if (!isHidden(channel) && typeof orig === "function") orig(args);
     }));
 
     patches.push(instead("fetchMessages", Fetcher, (args, orig) => {
         const [channel] = args;
+        if (channel.lMsg == undefined || channel.lMsg != channel.lastMessageId) channel.lMsg = channel.lastMessageId;
+        channel.lastMessageId = undefined;
         if (!isHidden(channel) && typeof orig === "function") orig(args);
     }));
 
     patches.push(instead("default", MessagesConnected, (args, orig) => {
         const channel = args[0]?.channel;
+        if (channel.lMsg == undefined || channel.lMsg != channel.lastMessageId) channel.lMsg = channel.lastMessageId;
+        channel.lastMessageId = undefined;
         if (!isHidden(channel) && typeof orig === "function") return orig(...args);
         else {return React.createElement(HiddenChannel, {channel})};
     }));

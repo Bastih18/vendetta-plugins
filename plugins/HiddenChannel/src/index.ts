@@ -36,7 +36,7 @@ function channelOverride(channel: any | undefined) {
 }
 
 function onLoad() {
-    console.log("HiddenChannel loaded 2.8");
+    console.log("HiddenChannel loaded 2.9");
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
     
     /*patches.push(instead("can", Permissions, (args, orig) => {
@@ -49,8 +49,7 @@ function onLoad() {
     }));*/
 
     patches.push(after("can", Permissions, ([permID, channel], res) => {
-        channel.lastMessageId = undefined;
-        return true;
+        return res;
     }));
 
     patches.push(instead("transitionToGuild", Router, (args, orig) => {

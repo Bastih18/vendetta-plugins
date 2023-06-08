@@ -31,18 +31,18 @@ function isHidden(channel: any | undefined) {
 
 function channelOverride(channel: any | undefined) {
     if(isHidden(channel)) {
-        if (channel.lMsg == undefined || channel.lMsg != channel.lastMessageId) channel.lMsg = channel.lastMessageId;
+        if ((channel.lMsg == undefined || channel.lMsg != channel.lastMessageId) && channel.lastMessageId != undefined) channel.lMsg = channel.lastMessageId;
         channel.lastMessageId = undefined;
     }
 }
 
 function onLoad() {
-    console.log("HiddenChannel loaded 3.5");
+    console.log("HiddenChannel loaded 3.6");
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
 
     patches.push(instead("hasUnread", ReadStateStore, (args, orig) => {
         if (isHidden(args[0])) { 
-            console.log("hasUnread ", args[0], " is hidden");
+            channelOverride(getChannel(args[0]));
             return false;
         };
         return orig(args);

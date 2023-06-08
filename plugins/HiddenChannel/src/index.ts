@@ -28,12 +28,13 @@ function isHidden(channel: any | undefined) {
     return res;
 }
 function onLoad() {
-    console.log("HiddenChannel loaded 1.7");
+    console.log("HiddenChannel loaded 1.8");
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
     
     patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
             if (channel.lMsg == undefined) channel.lMsg = channel.lastMessageId;
+            console.log(channel)
             channel.lastMessageId = undefined;
             return true;
         };
@@ -53,7 +54,7 @@ function onLoad() {
     patches.push(instead("default", MessagesConnected, (args, orig) => {
         const channel = args[0]?.channel;
         if (!isHidden(channel) && typeof orig === "function") return orig(...args);
-        else {console.log('Showing hidden channel stuff'); return React.createElement(HiddenChannel, {channel})};
+        else {return React.createElement(HiddenChannel, {channel})};
     }));
 }
 

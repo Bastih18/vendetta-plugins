@@ -30,16 +30,16 @@ function isHidden(channel: any | undefined) {
     return res;
 }
 function onLoad() {
-    console.log("HiddenChannel loaded 1.0");
+    console.log("HiddenChannel loaded 1.2");
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
     
     patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
             if(channel.id == "933799544737656952") {
-                console.log(channel)
+                console.log(channel.id, channel.lastMessageId)
                 lastMessageId.set(channel.id, channel.lastMessageId);
+                console.log("LMSGID: ", lastMessageId.get(channel.id))
                 channel.lastMessageId = undefined;
-                channel.iconEmoji = {id: null, name: '🔒'};
             };
             return true;
         };

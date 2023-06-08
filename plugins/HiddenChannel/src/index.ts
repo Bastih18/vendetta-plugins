@@ -17,6 +17,8 @@ const skipChannels = [
     ChannelTypes.GUILD_CATEGORY
 ]
 
+const lastMessageId = new Map();
+
 function isHidden(channel: any | undefined) {
     if (channel == undefined) return false;
     if (typeof channel === 'string')
@@ -35,10 +37,10 @@ function onLoad() {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
             if(channel.id == "933799544737656952") {
                 console.log(channel)
-                channel.lastMsgId = channel.lastMessageId;
-                console.log(channel.lastMsgId);
+                lastMessageId.set(channel.id, channel.lastMessageId);
                 channel.lastMessageId = undefined;
-            };          
+                channel.iconEmoji = {id: null, name: '🔒'};
+            };
             return true;
         };
         return res;
@@ -57,7 +59,7 @@ function onLoad() {
     patches.push(instead("default", MessagesConnected, (args, orig) => {
         const channel = args[0]?.channel;
         if (!isHidden(channel) && typeof orig === "function") return orig(...args);
-        else {console.log('Showing hidden channel stuff'); return React.createElement(HiddenChannel, {channel})};
+        else {console.log('Showing hidden channel stuff'); return React.createElement(HiddenChannel, {channel, lastMessageId: lastMessageId.get(channel.id)})};
     }));
 }
 

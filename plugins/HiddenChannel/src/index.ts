@@ -48,7 +48,7 @@ let readCmd = undefined;
 let muteCmd = undefined;
 
 function onLoad() {
-    console.log("HiddenChannel 5.3 loaded");
+    console.log("HiddenChannel 5.4 loaded");
 
     readCmd = registerCommand({
         name: "markhiddenread",
@@ -115,7 +115,9 @@ function onLoad() {
     patches.push(instead("default", MessagesConnected, (args, orig) => {
         const channel = args[0]?.channel;
         if (!isHidden(channel) && typeof orig === "function") return orig(...args);
-        else {return React.createElement(HiddenChannel, {channel})};
+        else {
+            bulkAck({channelId: channel.id, messageId: channel.lastMessageId});
+            return React.createElement(HiddenChannel, {channel})};
     }));
 }
 

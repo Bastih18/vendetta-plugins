@@ -36,32 +36,32 @@ function channelOverride(channel: any | undefined) {
 }
 
 function onLoad() {
-    console.log("HiddenChannel loaded 2.2");
+    console.log("HiddenChannel loaded 2.3");
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
     
-    patches.push(after("can", Permissions, async ([permID, channel], res) => {
+    patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
-            await channelOverride(channel);
+            channelOverride(channel);
             return true;
         };
         return res;
     }));
 
-    patches.push(instead("transitionToGuild", Router, async (args, orig) => {
+    patches.push(instead("transitionToGuild", Router, (args, orig) => {
         const [_, channel] = args;
-        await channelOverride(channel);
+        channelOverride(channel);
         if (!isHidden(channel) && typeof orig === "function") orig(args);
     }));
 
-    patches.push(instead("fetchMessages", Fetcher, async (args, orig) => {
+    patches.push(instead("fetchMessages", Fetcher, (args, orig) => {
         const [channel] = args;
-        await channelOverride(channel);
+        channelOverride(channel);
         if (!isHidden(channel) && typeof orig === "function") orig(args);
     }));
 
-    patches.push(instead("default", MessagesConnected, async (args, orig) => {
+    patches.push(instead("default", MessagesConnected, (args, orig) => {
         const channel = args[0]?.channel;
-        await channelOverride(channel);
+        channelOverride(channel);
         if (!isHidden(channel) && typeof orig === "function") return orig(...args);
         else {return React.createElement(HiddenChannel, {channel})};
     }));

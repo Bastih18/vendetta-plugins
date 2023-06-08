@@ -34,13 +34,14 @@ function onLoad() {
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
     
     patches.push(after("can", Permissions, ([permID, channel], res) => {
-        if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
-            if (lastMessageId.get(channel.id) == undefined)
+        if(isHidden(channel)) {
+            if (lastMessageId.get(channel.id) == undefined) {
                 lastMessageId.set(channel.id, channel.lastMessageId);
-            channel.lMsgId = lastMessageId.get(channel.id);
+                channel.lMsgId = lastMessageId.get(channel.id);
+            }
             channel.lastMessageId = undefined;
-            return true;
         };
+        if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) return true;
         return res;
     }));
 

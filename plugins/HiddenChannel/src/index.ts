@@ -17,8 +17,6 @@ const skipChannels = [
     ChannelTypes.GUILD_CATEGORY
 ]
 
-const lastMessageId = new Map();
-
 function isHidden(channel: any | undefined) {
     if (channel == undefined) return false;
     if (typeof channel === 'string')
@@ -35,10 +33,6 @@ function onLoad() {
     
     patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
-            if (lastMessageId.get(channel.id) == undefined) {
-                lastMessageId.set(channel.id, channel.lastMessageId);
-                channel.lMsgId = lastMessageId.get(channel.id);
-            }
             channel.lastMessageId = undefined;
             return true;
         };

@@ -33,11 +33,8 @@ function onLoad() {
     
     patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
-            if (channel.lMsg == undefined) channel.lMsg = channel.lastMessageId;
+            if (channel.lMsg == undefined || channel.lMsg != channel.lastMessageId) channel.lMsg = channel.lastMessageId;
             channel.lastMessageId = undefined;
-            if (channel.id == "933799544737656952") {
-                console.log(channel)
-            }
             return true;
         };
         return res;

@@ -62,8 +62,6 @@ export default function HiddenChannel({channel}) {
             Last message: {channel.lMsg ? <FancyDate date={new Date(snowflakeUtils.extractTimestamp(channel.lMsg))} /> : "No messages."}
             {"\n\n"}
             Last pin: {channel.lastPinTimestamp ? <FancyDate date={new Date(channel.lastPinTimestamp)} /> : "No pins."}
-            {"\n\n"}
-            Permissions: {channel.permissions}
         </Text>
     </View>
 }

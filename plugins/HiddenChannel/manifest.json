@@ -1,14 +1,10 @@
 {
     "name": "Hidden channels 2",
-    "description": "View the name and description of channels you can't access",
+    "description": "Basically HiddenChannels from cloudburst but better",
     "authors": [
         {
             "name": "bastih18",
             "id": "273797150880563201"
-        },
-        {
-            "name": "cloudburst",
-            "id": "892128204150685769"
         }
     ],
     "main": "src/index.ts",

@@ -38,12 +38,15 @@ function channelOverride(channel: any | undefined) {
 }
 
 function onLoad() {
-    console.log("HiddenChannel loaded 4.3");
+    console.log("HiddenChannel loaded 4.4");
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
 
     patches.push(instead("hasUnread", ReadStateStore, (args, orig) => {
         const channel = getChannel(args[0]);
-        if (isHidden(channel)) return false;
+        if (isHidden(channel)) {
+            channel.lastMessageId = undefined;
+            return false;
+        };
         return orig(args);
     }));
 

@@ -35,8 +35,7 @@ function onLoad() {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
             if (channel.lMsg == undefined || channel.lMsg != channel.lastMessageId) channel.lMsg = channel.lastMessageId;
             channel.lastMessageId = undefined;
-            if (channel.id == "933799544737656952")
-                console.log("HiddenChannel: can", res);
+            console.log(channel.name);
             return true;
         };
         return res;

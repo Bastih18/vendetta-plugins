@@ -38,7 +38,7 @@ function channelOverride(channel: any | undefined) {
 }
 
 function onLoad() {
-    console.log("HiddenChannel loaded 4.6");
+    console.log("HiddenChannel loaded 4.7");
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
 
     
@@ -49,20 +49,22 @@ function onLoad() {
         return ret;
     }, true);
     console.log("HiddenChannel: Patching channel overrides done");
-    ReadStateStore.getForDebugging(Object.keys(ChannelStore.__getLocalVars().guildChannels)[0])
-    console.log("HiddenChannel: Patching channel overrides done 2");
+    //ReadStateStore.getForDebugging(Object.keys(ChannelStore.__getLocalVars().guildChannels)[0])
+    //console.log("HiddenChannel: Patching channel overrides done 2");
     
-/*     patches.push(instead("hasUnread", ReadStateStore, (args, orig) => {
+     patches.push(instead("hasUnread", ReadStateStore, (args, orig) => {
         const channel = getChannel(args[0]);
         if (isHidden(channel)) {
-            ReadStateStore.getForDebugging(channel.id);
+            ReadStateStore.getForDebugging(getChannel(channel.id));
             return false;
         };
         return orig(args);
-    })); */
+    }));
 
     patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
+            ReadStateStore.getForDebugging(getChannel(channel.id));
+            channelOverride(channel);
             return true;
         };
         return res;

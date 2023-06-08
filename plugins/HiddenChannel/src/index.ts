@@ -11,6 +11,8 @@ const Fetcher = findByProps("stores", "fetchMessages");
 const { ChannelTypes } = findByProps("ChannelTypes");
 const {getChannel} = findByProps("getChannel");
 
+const getChannelSettingsStore = findByProps("UserChannelSettingsStore");
+
 const skipChannels = [
     ChannelTypes.DM, 
     ChannelTypes.GROUP_DM, 
@@ -33,7 +35,11 @@ function onLoad() {
     
     patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
-            if(channel.id == "933799544737656952") channel.lastMessageId = undefined;
+            if(channel.id == "933799544737656952") {
+                channel.lastMsgId = channel.lastMessageId;
+                channel.lastMessageId = undefined;
+                console.log(getChannelSettingsStore.getChannelSettings(channel.id));
+            };          
             return true;
         };
         return res;

@@ -1,6 +1,6 @@
 import { findByName, findByStoreName, findByProps } from "@vendetta/metro";
 import { constants, React } from "@vendetta/metro/common";
-import { instead, after } from "@vendetta/patcher";
+import { instead, after, before } from "@vendetta/patcher";
 import HiddenChannel from "./HiddenChannel";
 
 let patches = [];
@@ -10,7 +10,8 @@ const Router = findByProps("transitionToGuild");
 const Fetcher = findByProps("stores", "fetchMessages");
 const { ChannelTypes } = findByProps("ChannelTypes");
 const {getChannel} = findByProps("getChannel");
-const ReadStateStore = findByStoreName("ReadStateStore")
+const ReadStateStore = findByStoreName("ReadStateStore");
+const ChannelStore = findByStoreName("ChannelStore");
 
 const skipChannels = [
     ChannelTypes.DM, 
@@ -37,17 +38,17 @@ function channelOverride(channel: any | undefined) {
 }
 
 function onLoad() {
-    console.log("HiddenChannel loaded 3.9");
+    console.log("HiddenChannel loaded 4.0");
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
 
-    patches.push(instead("hasUnread", ReadStateStore, (args, orig) => {
-        if (isHidden(args[0])) { 
-            console.log(getChannel(args[0]));
-            channelOverride(getChannel(args[0]));
-            return false;
-        };
-        return orig(args);
-    }));
+    const __tempPatch = after("getForDebugging", ReadStateStore, (_, ret) => {
+        patches.push(before("canBeUnread", ret.__proto__, function() {
+          if (isHidden(this.channelId)) return false;
+        }));
+        __tempPatch();
+        return ret;
+      });
+    ReadStateStore.getForDebugging(Object.keys(ChannelStore.__getLocalVars().guildChannels)[0])
 
     patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {

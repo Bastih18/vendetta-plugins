@@ -33,7 +33,13 @@ function onLoad() {
     
     patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) return true;
+        console.log("RES", res);
         return res;
+    }));
+
+    patches.push(instead("transitionToGuild", Router, (args, orig) => {
+        const [_, channel] = args;
+        if (!isHidden(channel) && typeof orig === "function") orig(args);
     }));
 
     patches.push(instead("fetchMessages", Fetcher, (args, orig) => {

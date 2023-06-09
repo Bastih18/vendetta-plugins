@@ -48,7 +48,7 @@ let readCmd = undefined;
 //let muteCmd = undefined;
 
 function onLoad() {
-    console.log("HiddenChannel 5.7 loaded");
+    console.log("HiddenChannel 6.1 loaded");
 
     readCmd = registerCommand({
         name: "markhiddenread",
@@ -73,13 +73,6 @@ function onLoad() {
     
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
 
-    // block ChatInputActionButton with key="1" from rendering
-    patches.push(instead("default", findByName("ChatInput"), (args, orig) => {
-        const [props] = args;
-        props.canStartThreads = false;
-        return orig(...args);
-    }));
-
     patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
             if (isHidden(channel)) {
@@ -103,8 +96,7 @@ function onLoad() {
     patches.push(instead("default", MessagesConnected, (args, orig) => {
         const channel = args[0]?.channel;
         if (!isHidden(channel) && typeof orig === "function") return orig(...args);
-        else {
-            return React.createElement(HiddenChannel, {channel})};
+        else {return React.createElement(HiddenChannel, {channel})};
     }));
 }
 

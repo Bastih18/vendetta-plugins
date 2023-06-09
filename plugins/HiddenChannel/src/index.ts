@@ -49,7 +49,7 @@ let readCmd = undefined;
 //let muteCmd = undefined;
 
 function onLoad() {
-    console.log("HiddenChannel 5.7 loaded");
+    console.log("HiddenChannel 5.8 loaded");
 
     readCmd = registerCommand({
         name: "markhiddenread",
@@ -73,11 +73,6 @@ function onLoad() {
     })
     
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
-    
-    patches.push(after("render", ChatInput.prototype, ([props], res) => {
-        const channel = props.channel;
-        console.log(channel);
-    }));
 
     patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
@@ -86,6 +81,7 @@ function onLoad() {
             }
             return true;
         };
+        if (permID === constants.Permissions.CAN_START_THREADS) return false;
         return res;
     }));
 

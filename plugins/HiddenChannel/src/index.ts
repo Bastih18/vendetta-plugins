@@ -48,7 +48,7 @@ let readCmd = undefined;
 //let muteCmd = undefined;
 
 function onLoad() {
-    console.log("HiddenChannel 5.9 loaded");
+    console.log("HiddenChannel 5.7 loaded");
 
     readCmd = registerCommand({
         name: "markhiddenread",
@@ -74,9 +74,9 @@ function onLoad() {
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
 
     // block ChatInputActionButton with key="1" from rendering
-    patches.push(instead("default", findByProps("ChatInputActionButton"), (args, orig) => {
+    patches.push(instead("default", findByName("ChatInput"), (args, orig) => {
         const [props] = args;
-        if (props.key === "1") return null;
+        props.canStartThreads = false;
         return orig(...args);
     }));
 

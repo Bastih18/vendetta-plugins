@@ -17,6 +17,7 @@ const Fetcher = findByProps("stores", "fetchMessages");
 const { ChannelTypes } = findByProps("ChannelTypes");
 const {getChannel} = findByProps("getChannel");
 const { bulkAck } = findByProps("bulkAck")
+const {ChatInput} = findByName("ChatInput");
 
 const skipChannels = [
     ChannelTypes.DM, 
@@ -45,10 +46,10 @@ function addUnreadChannel(channel: any | undefined) {
 }
 
 let readCmd = undefined;
-let muteCmd = undefined;
+//let muteCmd = undefined;
 
 function onLoad() {
-    console.log("HiddenChannel 5.6 loaded");
+    console.log("HiddenChannel 5.7 loaded");
 
     readCmd = registerCommand({
         name: "markhiddenread",
@@ -70,28 +71,14 @@ function onLoad() {
             }
         }
     })
-
-    muteCmd = registerCommand({
-        name: "mutehidden",
-        displayName: "mutehidden",
-        description: "mute all hidden channels in this guild",
-        displayDescription: "mute all hidden channels in this guild",
-        options: [],
-        inputType: ApplicationCommandInputType.BUILT_IN_TEXT as number,
-        type: ApplicationCommandType.CHAT as number,
-        execute: async (args, ctx) => {
-            try {
-
-            } catch(e) {
-                console.log(e);
-                logger.error(e);
-                return ClydeUtils.sendBotMessage(ctx.channel.id, "Error muting channels");
-            }
-        }
-    });
     
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
-        
+    
+    patches.push(after("render", ChatInput.prototype, ([props], res) => {
+        const channel = props.channel;
+        console.log(channel);
+    }));
+
     patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
             if (isHidden(channel)) {
@@ -116,7 +103,6 @@ function onLoad() {
         const channel = args[0]?.channel;
         if (!isHidden(channel) && typeof orig === "function") return orig(...args);
         else {
-            bulkAck({channelId: channel.id, messageId: channel.lastMessageId});
             return React.createElement(HiddenChannel, {channel})};
     }));
 }
@@ -125,7 +111,7 @@ export default {
     onLoad,
     onUnload: () => {
         readCmd();
-        muteCmd();
+//        muteCmd();
         for (const unpatch of patches) {
             unpatch();
         };

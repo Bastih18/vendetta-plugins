@@ -17,7 +17,6 @@ const Fetcher = findByProps("stores", "fetchMessages");
 const { ChannelTypes } = findByProps("ChannelTypes");
 const {getChannel} = findByProps("getChannel");
 const { bulkAck } = findByProps("bulkAck")
-const {ChatInput} = findByName("ChatInput");
 
 const skipChannels = [
     ChannelTypes.DM, 
@@ -49,7 +48,7 @@ let readCmd = undefined;
 //let muteCmd = undefined;
 
 function onLoad() {
-    console.log("HiddenChannel 5.8 loaded");
+    console.log("HiddenChannel 5.9 loaded");
 
     readCmd = registerCommand({
         name: "markhiddenread",
@@ -74,6 +73,13 @@ function onLoad() {
     
     const MessagesConnected = findByName("MessagesWrapperConnected", false);
 
+    // block ChatInputActionButton with key="1" from rendering
+    patches.push(instead("default", findByProps("ChatInputActionButton"), (args, orig) => {
+        const [props] = args;
+        if (props.key === "1") return null;
+        return orig(...args);
+    }));
+
     patches.push(after("can", Permissions, ([permID, channel], res) => {
         if (!channel?.realCheck && permID === constants.Permissions.VIEW_CHANNEL) {
             if (isHidden(channel)) {
@@ -81,7 +87,6 @@ function onLoad() {
             }
             return true;
         };
-        if (permID === constants.Permissions.CAN_START_THREADS) return false;
         return res;
     }));
 
